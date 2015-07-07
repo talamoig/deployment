@@ -40,6 +40,7 @@ servicedir="$(cd $(dirname $0) && pwd)"
 cfgversion=
 privauthdir=
 release=
+batchmode=false
 
 case $(uname) in
   Darwin ) arch=osx108_amd64_gcc481 xargsr="xargs" ;;
@@ -60,6 +61,7 @@ while [ $# -ge 1 ]; do
     -R ) release="cms+$(echo $2 | tr @ +)"; shift; shift ;;
     -M ) MIGRATION=true; shift ;;
     -a ) nogroups=false; shift ;;
+    -b ) batchmode=true; shift ;;
     -r ) repoedit="s/${2%=*}/${2#*=}/; $repoedit"; shift; shift ;;
     -s ) stages="$2"; shift; shift ;;
     -t ) cfgversion="$2"; shift; shift ;;

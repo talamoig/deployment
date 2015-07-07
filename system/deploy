@@ -492,7 +492,13 @@ deploy_system_post()
         free=$(($(sudo parted -s /dev/vda -- unit B print free|grep 'Free Space' |tail -n1|awk '{ print $3 }' |tr -d 'B')))
         if [ $free -ge 1000000000 ]; then
           note "INFO: can resize '/' to increase in $((free / 1000000)) MB. Proceed? (y/n) "
-          read answer
+          if [ "X$batchmode" = "Xtrue" ]
+          then
+              note "INFO: running in batchmode"
+              answer='y'
+          else
+              read answer
+	  fi
           case $answer in
             y )
               note "INFO: starting to resize. This operation may take a long time to complete. Please wait."
