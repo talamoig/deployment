@@ -67,8 +67,16 @@ case $STAGE in
     set -ex
     mkdir -p $ROOT
     $PWD/cfg/Deploy $ARCH $RELEASE $ACFG -t $VER $MULTIACC -w $RPMHOST -s prep $ROOT $PKGS
-    [ ! -d $ROOT/$VER/auth/proxy ] ||
-      ssh -o PubkeyAuthentication=no -t $PXUSER@$(hostname) $PWD/cfg/admin/ProxySeed -t dev -d $USER@$(hostname -f):$ROOT/$VER/auth/proxy
+    if [ ! -d $ROOT/$VER/auth/proxy ] 
+    then
+        echo "PXUSER:$PXUSER"
+        if [ "$PXUSER" != "$USER" ]
+        then
+            ssh -o PubkeyAuthentication=no -t $PXUSER@$(hostname) $PWD/cfg/admin/ProxySeed -t dev -d $USER@$(hostname -f):$ROOT/$VER/auth/proxy
+        else
+            $PWD/cfg/admin/ProxySeed -t dev -d $ROOT/$VER/auth/proxy
+        fi
+    fi
     cmd="$PWD/cfg/Deploy $ARCH $RELEASE $ACFG $REPO -t $VER $MULTIACC -w $RPMHOST -s sw $ROOT $PKGS"
     case $MULTIACC in -a) sudo -H -u _sw bashs -lc "$cmd";; *) eval $cmd;; esac
     $PWD/cfg/Deploy $ARCH $RELEASE $REPO -t $VER $MULTIACC -w $RPMHOST -s post $ROOT $PKGS
